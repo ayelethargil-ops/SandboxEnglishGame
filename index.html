@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>משחק אנגלית עם אימוג'ים</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 10px;
+            box-sizing: border-box;
+            color: #333
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 500px
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 32px
+        }
+
+        h2 {
+            color: #764ba2;
+            margin: 20px 0 15px;
+            font-size: 24px
+        }
+
+        .topic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            margin: 20px 0
+        }
+
+        .topic-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3)
+        }
+
+        .topic-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5)
+        }
+
+        .topic-icon {
+            font-size: 40px;
+            margin-bottom: 10px
+        }
+
+        .direction-selector {
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px
+        }
+
+        .direction-btn {
+            padding: 15px 25px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 2px solid #667eea;
+            background: white;
+            border-radius: 12px;
+            font-weight: 600;
+            color: #667eea;
+            transition: all 0.2s
+        }
+
+        .direction-btn.active {
+            background: #667eea;
+            color: white
+        }
+
+        .direction-btn:hover {
+            transform: scale(1.05)
+        }
+
+        .game-container {
+            display: none
+        }
+
+        .score-box {
+            font-size: 18px;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between
+        }
+
+        .word-display {
+            font-size: 48px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin: 10px 0;
+            min-height: 60px
+        }
+
+        .word-emoji {
+            font-size: 60px;
+            margin: 15px 0
+        }
+
+        .speaker-btn {
+            font-size: 32px;
+            cursor: pointer;
+            background: #f1f3f5;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            margin: 10px 0;
+            transition: all 0.2s
+        }
+
+        .speaker-btn:hover {
+            background: #e9ecef;
+            transform: scale(1.1)
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 20px
+        }
+
+        button.opt-btn {
+            padding: 18px;
+            font-size: 19px;
+            cursor: pointer;
+            border: 2px solid #dee2e6;
+            background: white;
+            border-radius: 15px;
+            font-weight: 600;
+            color: #495057;
+            transition: all 0.2s
+        }
+
+        button.opt-btn:hover:not(:disabled) {
+            border-color: #667eea;
+            transform: translateX(-3px)
+        }
+
+        .attempts-left {
+            font-size: 15px;
+            color: #f59f00;
+            margin: 10px 0;
+            font-weight: bold
+        }
+
+        .mistake-item {
+            color: #fa5252;
+            margin: 10px 0;
+            font-size: 17px;
+            padding: 12px;
+            background: #fff5f5;
+            border-radius: 12px;
+            text-align: right;
+            border-right: 4px solid #fa5252
+        }
+
+        .action-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 16px;
+            width: 100%;
+            border-radius: 15px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: 600;
+            transition: all 0.2s
+        }
+
+        .action-btn:hover {
+            background: #5568d3;
+            transform: translateY(-2px)
+        }
+
+        .action-btn.secondary {
+            background: #37b24d
+        }
+
+        .action-btn.secondary:hover {
+            background: #2f9e44
+        }
+
+        #feedback {
+            margin-top: 15px;
+            font-weight: 600;
+            min-height: 30px;
+            font-size: 18px
+        }
+
+        .back-btn {
+            background: #868e96;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-size: 16px
+        }
+
+        .back-btn:hover {
+            background: #6c757d
+        }
+
+        .progress-banner {
+            background: #f0f4ff;
+            color: #4c6ef5;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            border: 1px dashed #4c6ef5;
+        }
+
+        .topic-info {
+            background: #e7f5ff;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            color: #1971c2;
+            font-weight: 600;
+            border-right: 4px solid #339af0
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container" id="topic-screen">
+        <h1>🎯 מרכז למידת אנגלית</h1>
+        <p style="color:#6c757d;font-size:16px">בחרו נושא ללימוד</p>
+        <div class="topic-grid">
+            <button class="topic-card" onclick="selectTopic('inbar_test')" style="background:linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%); color: #d63384;">
+                <div class="topic-icon">💎</div>
+                <div>מבחן ענבר<br>Unit 3</div>
+            </button>
+            <button class="topic-card" onclick="selectTopic('ofri')">
+                <div class="topic-icon">📚</div>
+                <div>מילים משיעור<br>עופרי</div>
+            </button>
+            <button class="topic-card" onclick="selectTopic('ofri_test')">
+                <div class="topic-icon">📝</div>
+                <div>מבחן אנגלית ד1<br></div>
+            </button>
+            <button class="topic-card" onclick="selectTopic('animals')">
+                <div class="topic-icon">🦁</div>
+                <div>בעלי חיים</div>
+            </button>
+            <button class="topic-card" onclick="selectTopic('colors')">
+                <div class="topic-icon">🎨</div>
+                <div>צבעים</div>
+            </button>
+            <button class="topic-card" onclick="selectTopic('pronouns')">
+                <div class="topic-icon">👤</div>
+                <div>כינויים</div>
+            </button>
+            <button class="topic-card" onclick="selectTopic('numbers')">
+                <div class="topic-icon">🔢</div>
+                <div>מספרים</div>
+            </button>
+            <button class="topic-card" onclick="selectTopic('verbs')">
+                <div class="topic-icon">🏃</div>
+                <div>פעלים</div>
+            </button>
+            <button class="topic-card" onclick="selectTopic('food')">
+                <div class="topic-icon">🍕</div>
+                <div>אוכל</div>
+            </button>
+            <button class="topic-card" onclick="selectTopic('family')">
+                <div class="topic-icon">👨‍👩‍👧</div>
+                <div>משפחה</div>
+            </button>
+            <button class="topic-card" onclick="selectTopic('all')"
+                style="background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%)">
+                <div class="topic-icon">🌟</div>
+                <div>כל המילים<br>(מאתגר!)</div>
+            </button>
+        </div>
+    </div>
+    
+    <div class="container" id="direction-screen" style="display:none">
+        <h2>🔄 בחרו כיוון שאלות</h2>
+        <div class="topic-info" id="selected-topic-info"></div>
+        <div class="direction-selector">
+            <p style="margin-bottom:15px;color:#495057;font-weight:600">איך תרצו לתרגל?</p>
+            <button class="direction-btn active" onclick="selectDirection('en-he')" id="btn-en-he">🇬🇧 ➜ 🇮🇱<br><span
+                    style="font-size:14px">אנגלית לעברית</span></button>
+            <button class="direction-btn" onclick="selectDirection('he-en')" id="btn-he-en">🇮🇱 ➜ 🇬🇧<br><span
+                    style="font-size:14px">עברית לאנגלית</span></button>
+        </div>
+        <button class="action-btn" onclick="startGame()">🎮 התחל משחק!</button>
+        <button class="back-btn" onclick="backToTopics()">← חזרה לנושאים</button>
+    </div>
+
+    <div class="container game-container" id="game-screen">
+        <div class="score-box"><span id="score">ניקוד: 0</span><span id="question-count">שאלה: 1/10</span></div>
+        <div id="word" class="word-display">---</div>
+        <div id="word-emoji" class="word-emoji" style="display:none"></div>
+        <button class="speaker-btn" onclick="speakWord()" id="speaker">🔊</button>
+        <div id="attempts" class="attempts-left">ניסיונות נותרים: 3</div>
+        <div class="options" id="options">
+            <button class="opt-btn" onclick="checkAnswer(0)">-</button>
+            <button class="opt-btn" onclick="checkAnswer(1)">-</button>
+            <button class="opt-btn" onclick="checkAnswer(2)">-</button>
+            <button class="opt-btn" onclick="checkAnswer(3)">-</button>
+        </div>
+        <div id="feedback"></div>
+        <button class="back-btn" onclick="backToDirection()" style="margin-top:20px">← חזרה</button>
+    </div>
+
+    <div class="container game-container" id="summary-screen">
+        <div id="overall-progress" class="progress-banner"></div>
+        <h2 style="color:#667eea">🎊 סיכום סבב</h2>
+        <p id="final-score" style="font-size:24px;margin-bottom:20px;font-weight:bold"></p>
+        <div id="mistakes-list" style="margin-bottom:20px"></div>
+        <button id="retry-mistakes-btn" class="action-btn secondary" onclick="startRetrySession()">🔄 חזור על המילים
+            המאתגרות</button>
+        <button class="action-btn" onclick="resetGame()">🎮 סבב חדש (מילים חדשות)</button>
+        <button class="back-btn" onclick="backToTopics()">← בחר נושא אחר</button>
+    </div>
+
+    <script>
+        // המאגרים נשארו זהים (לא שיניתי את התוכן כדי לחסוך מקום, אך הקוד מצפה להם)
+        const wordBanks = {
+            inbar_test: [
+                { en: "Action", he: "פעולה", pr: "אקשן", emoji: "🎬" },
+                { en: "Advantage", he: "יתרון", pr: "אדוונטג'", emoji: "📈" },
+                { en: "Adventure", he: "הרפתקה", pr: "אדוונצ'ר", emoji: "🤠" },
+                { en: "Arrival", he: "הגעה", pr: "אריבל", emoji: "🛬" },
+                { en: "Church", he: "כנסייה", pr: "צ'רצ'", emoji: "⛪" },
+                { en: "Cinema", he: "קולנוע", pr: "סינמה", emoji: "🍿" },
+                { en: "Conversation", he: "שיחה", pr: "קונברסיישן", emoji: "💬" },
+                { en: "Country", he: "מדינה / אזור כפרי", pr: "קאנטרי", emoji: "🌍" },
+                { en: "Couple", he: "זוג", pr: "קאפל", emoji: "👩‍❤️‍👨" },
+                { en: "Credit card", he: "כרטיס אשראי", pr: "קרדיט קארד", emoji: "💳" },
+                { en: "Difficulty", he: "קושי", pr: "דיפיקולטי", emoji: "😫" },
+                { en: "Earth", he: "כדור הארץ / אדמה", pr: "ארת'", emoji: "🌎" },
+                { en: "Effect", he: "השפעה", pr: "אפקט", emoji: "✨" },
+                { en: "Energy", he: "אנרגיה", pr: "אנרג'י", emoji: "⚡" },
+                { en: "Experience", he: "חוויה / ניסיון", pr: "אקספיריאנס", emoji: "🎢" },
+                { en: "Flight", he: "טיסה", pr: "פלייט", emoji: "✈️" },
+                { en: "Flower", he: "פרח", pr: "פלאואר", emoji: "🌸" },
+                { en: "Guy", he: "בחור", pr: "גאי", emoji: "👦" },
+                { en: "Hero", he: "גיבור", pr: "הירו", emoji: "🦸" },
+                { en: "Line", he: "שורה / תור", pr: "ליין", emoji: "📏" },
+                { en: "Mail", he: "דואר", pr: "מייל", emoji: "✉️" },
+                { en: "Midnight", he: "חצות", pr: "מידנייט", emoji: "🕛" },
+                { en: "Mosque", he: "מסגד", pr: "מוסק", emoji: "🕌" },
+                { en: "Opinion", he: "דעה", pr: "אופיניון", emoji: "🗣️" },
+                { en: "Passenger", he: "נוסע", pr: "פסנג'ר", emoji: "🧳" },
+                { en: "Pilot", he: "טייס", pr: "פיילוט", emoji: "👨‍✈️" },
+                { en: "Plane", he: "מטוס", pr: "פליין", emoji: "🛩️" },
+                { en: "Purpose", he: "מטרה", pr: "פרפוס", emoji: "🎯" },
+                { en: "Sort", he: "סוג", pr: "סורט", emoji: "🗂️" },
+                { en: "Space", he: "חלל", pr: "ספייס", emoji: "🚀" },
+                { en: "Synagogue", he: "בית כנסת", pr: "סינאגוג", emoji: "🕍" },
+                { en: "Ticket", he: "כרטיס", pr: "טיקט", emoji: "🎟️" },
+                { en: "Type", he: "סוג / להקליד", pr: "טייפ", emoji: "⌨️" },
+                { en: "Vacation", he: "חופשה", pr: "ווקיישן", emoji: "🏖️" },
+                { en: "Beat", he: "להביס", pr: "ביט", emoji: "🏆" },
+                { en: "Fight", he: "להילחם", pr: "פייט", emoji: "⚔️" },
+                { en: "Insist", he: "להתעקש", pr: "אינסיסט", emoji: "✊" },
+                { en: "Land", he: "לנחות", pr: "לנד", emoji: "🛬" },
+                { en: "Manage", he: "לנהל / להסתדר", pr: "מנאג'", emoji: "💼" },
+                { en: "Offer", he: "להציע", pr: "אופר", emoji: "🤝" },
+                { en: "Order", he: "להזמין / סדר", pr: "אורדר", emoji: "📦" },
+                { en: "Remain", he: "להישאר", pr: "רימיין", emoji: "⏳" },
+                { en: "Save", he: "לחסוך / להציל", pr: "סייב", emoji: "💾" },
+                { en: "Seem", he: "נראה ש...", pr: "סים", emoji: "🤔" },
+                { en: "Suggest", he: "להציע", pr: "סג'סט", emoji: "💡" },
+                { en: "Take off", he: "להמריא / להוריד בגד", pr: "טייק אוף", emoji: "🛫" },
+                { en: "Central", he: "מרכזי", pr: "סנטרל", emoji: "📍" },
+                { en: "Christian", he: "נוצרי", pr: "כריסטיאן", emoji: "✝️" },
+                { en: "Cool", he: "מגניב", pr: "קול", emoji: "😎" },
+                { en: "Impossible", he: "בלתי אפשרי", pr: "אימפוסיבל", emoji: "🚫" },
+                { en: "Jewish", he: "יהודי", pr: "ג'ואיש", emoji: "🔯" },
+                { en: "Muslim", he: "מוסלמי", pr: "מוסלם", emoji: "☪️" },
+                { en: "Ordinary", he: "רגיל", pr: "אורדינרי", emoji: "😐" },
+                { en: "Real", he: "אמיתי", pr: "ריל", emoji: "✔️" },
+                { en: "Recent", he: "שהיה לאחרונה", pr: "ריסנט", emoji: "🕒" },
+                { en: "Simple", he: "פשוט", pr: "סימפל", emoji: "💡" },
+                { en: "Useful", he: "שימושי", pr: "יוספול", emoji: "🛠️" },
+                { en: "Wonderful", he: "נפלא", pr: "וונדרפול", emoji: "🌟" },
+                { en: "Although", he: "למרות ש...", pr: "אלד'או", emoji: "🔄" },
+                { en: "Anyhow", he: "בכל אופן", pr: "אניהאו", emoji: "🤷" },
+                { en: "Anymore", he: "כבר לא", pr: "אנימור", emoji: "🛑" },
+                { en: "Anyone", he: "כל אחד / מישהו", pr: "אניוואן", emoji: "👤" },
+                { en: "Anyplace", he: "כל מקום", pr: "אניפלייס", emoji: "📍" },
+                { en: "Anytime", he: "כל זמן שהוא", pr: "אניטיים", emoji: "⏰" },
+                { en: "Anyway", he: "בכל מקרה", pr: "אניוואי", emoji: "💁" },
+                { en: "Anywhere", he: "איפה שהוא", pr: "אניוור", emoji: "🗺️" },
+                { en: "At the moment", he: "ברגע זה", pr: "את דה מומנט", emoji: "⏱️" },
+                { en: "Especially", he: "במיוחד", pr: "אספשלי", emoji: "⭐" },
+                { en: "Even", he: "אפילו", pr: "איבן", emoji: "📈" },
+                { en: "I mean", he: "אני מתכוון", pr: "איי מין", emoji: "💬" },
+                { en: "In fact", he: "למעשה", pr: "אין פקט", emoji: "📌" },
+                { en: "It depends", he: "זה תלוי", pr: "איט דיפנדס", emoji: "⚖️" },
+                { en: "Near", he: "קרוב", pr: "ניר", emoji: "🏠" },
+                { en: "Normally", he: "בדרך כלל", pr: "נורמלי", emoji: "📅" },
+                { en: "Something else", he: "משהו אחר", pr: "סאמת'ינג אלס", emoji: "🎁" },
+                { en: "The Middle East", he: "המזרח התיכון", pr: "דה מידל איסט", emoji: "🗺️" },
+                { en: "Throughout", he: "במהלך", pr: "ת'רואאוט", emoji: "🔄" },
+                { en: "Have a good time", he: "ליהנות", pr: "הב אה גוד טיים", emoji: "🥳" },
+                { en: "Have a problem", he: "יש בעיה", pr: "הב אה פרובלם", emoji: "❓" },
+                { en: "Have a talk", he: "לנהל שיחה", pr: "הב אה טוק", emoji: "🗣️" },
+                { en: "Have (something) on", he: "ללבוש", pr: "הב און", emoji: "👕" },
+                { en: "Let go of", he: "לשחרר", pr: "לט גו", emoji: "🎈" },
+                { en: "Let (something) in", he: "להכניס", pr: "לט אין", emoji: "📥" },
+                { en: "Let (something) out", he: "להוציא", pr: "לט אאוט", emoji: "📤" },
+                { en: "Take a test", he: "להיבחן", pr: "טייק אה טסט", emoji: "📝" },
+                { en: "Take a tour", he: "לצאת לסיור", pr: "טייק אה טור", emoji: "🔭" },
+                { en: "Take a trip", he: "לצאת לטיול", pr: "טייק אה טריפ", emoji: "🎒" },
+                { en: "Take place", he: "להתקיים", pr: "טייק פלייס", emoji: "📅" },
+                { en: "Think about", he: "לחשוב על", pr: "ת'ינק אבאוט", emoji: "💭" },
+                { en: "Think of", he: "לחשוב על", pr: "ת'ינק אוף", emoji: "💡" },
+                { en: "Think so", he: "לחשוב כך", pr: "ת'ינק סו", emoji: "👍" }
+            ],
+            ofri_test: [
+                { en: "autumn", he: "סתיו", pr: "אוטום", emoji: "🍂" },
+                { en: "basketball", he: "כדורסל", pr: "בסקטבול", emoji: "🏀" },
+                { en: "beautiful", he: "יפה", pr: "ביוטיפול", emoji: "✨" },
+                { en: "boots", he: "מגפיים", pr: "בוטס", emoji: "🥾" },
+                { en: "children", he: "ילדים", pr: "צ'ילדרן", emoji: "🧒" },
+                { en: "climb", he: "לטפס", pr: "קליים", emoji: "🧗" },
+                { en: "cloud", he: "ענן", pr: "קלאוד", emoji: "☁️" },
+                { en: "coat", he: "מעיל", pr: "קואוט", emoji: "🧥" },
+                { en: "cold", he: "קר", pr: "קולד", emoji: "❄️" },
+                { en: "come", he: "לבוא", pr: "קאם", emoji: "👋" },
+                { en: "dress", he: "שמלה", pr: "דרס", emoji: "👗" },
+                { en: "eat", he: "לאכול", pr: "איט", emoji: "🍽️" },
+                { en: "eyes", he: "עיניים", pr: "אייז", emoji: "👀" },
+                { en: "father", he: "אבא", pr: "פאד'ר", emoji: "👨" },
+                { en: "fly a kite", he: "להעיף עפיפון", pr: "פליי אה קייט", emoji: "🪁" },
+                { en: "funny", he: "מצחיק", pr: "פאני", emoji: "😂" },
+                { en: "game", he: "משחק", pr: "גיים", emoji: "🎮" },
+                { en: "home", he: "בית", pr: "הום", emoji: "🏠" },
+                { en: "ice cream", he: "גלידה", pr: "אייס קרים", emoji: "🍦" },
+                { en: "mother", he: "אמא", pr: "מאד'ר", emoji: "👩" },
+                { en: "mouth", he: "פה", pr: "מאות'", emoji: "👄" },
+                { en: "nose", he: "אף", pr: "נואוז", emoji: "👃" },
+                { en: "pants", he: "מכנסיים", pr: "פנסט", emoji: "👖" },
+                { en: "park", he: "פארק", pr: "פארק", emoji: "🌳" },
+                { en: "picture", he: "תמונה", pr: "פיקצ'ר", emoji: "🖼️" },
+                { en: "play", he: "לשחק", pr: "פליי", emoji: "🎲" },
+                { en: "pool", he: "בריכה", pr: "פול", emoji: "🏊" },
+                { en: "shoes", he: "נעליים", pr: "שוז", emoji: "👟" },
+                { en: "sky", he: "שמיים", pr: "סקיי", emoji: "🌌" },
+                { en: "sleep", he: "לישון", pr: "סליפ", emoji: "😴" },
+                { en: "snow", he: "שלג", pr: "סנואו", emoji: "🌨️" },
+                { en: "socks", he: "גרביים", pr: "סוקס", emoji: "🧦" },
+                { en: "spring", he: "אביב", pr: "ספרינג", emoji: "🌸" },
+                { en: "summer", he: "קיץ", pr: "סאמר", emoji: "☀️" },
+                { en: "sunny", he: "שמשי", pr: "סאני", emoji: "🌞" },
+                { en: "winter", he: "חורף", pr: "ווינטר", emoji: "☃️" },
+                { en: "big", he: "גדול", pr: "ביג", emoji: "🐘" },
+                { en: "small", he: "קטן", pr: "סמול", emoji: "🐭" },
+                { en: "long", he: "ארוך", pr: "לונג", emoji: "📏" },
+                { en: "short", he: "קצר", pr: "שורט", emoji: "📐" },
+                { en: "happy", he: "שמח", pr: "האפי", emoji: "😊" },
+                { en: "sad", he: "עצוב", pr: "סאד", emoji: "😢" },
+                { en: "good", he: "טוב", pr: "גוד", emoji: "👍" },
+                { en: "bad", he: "רע", pr: "באד", emoji: "👎" },
+                { en: "chair", he: "כיסא", pr: "צ'ייר", emoji: "🪑" },
+                { en: "table", he: "שולחן", pr: "טייבל", emoji: " tavolo" },
+                { en: "face", he: "פנים", pr: "פייס", emoji: "👩" },
+                { en: "hand", he: "יד", pr: "האנד", emoji: "✋" },
+                { en: "leg", he: "רגל", pr: "לג", emoji: "🦵" },
+                { en: "hat", he: "כובע", pr: "האט", emoji: "🎩" },
+                { en: "too", he: "גם", pr: "טו", emoji: "➕" },
+                { en: "tree", he: "עץ", pr: "טרי", emoji: "🌳" },
+                { en: "wall", he: "קיר", pr: "וול", emoji: "🧱" },
+                { en: "warm", he: "חמים", pr: "וורם", emoji: "☀️" },
+                { en: "we", he: "אנחנו", pr: "ווי", emoji: "👥" },
+                { en: "wear", he: "ללבוש", pr: "וור", emoji: "👕" },
+                { en: "who", he: "מי", pr: "הו", emoji: "❓" },
+                { en: "under", he: "מתחת", pr: "אנדר", emoji: "👇" },
+                { en: "very", he: "מאוד", pr: "וורי", emoji: "❗" },
+                { en: "walk", he: "ללכת", pr: "ווק", emoji: "🚶" },
+                { en: "want", he: "רוצה", pr: "וונט", emoji: "🙏" },
+                { en: "wash", he: "לשטוף", pr: "ווש", emoji: "🧼" },
+                { en: "watch", he: "לצפות/שעון", pr: "וואץ'", emoji: "⌚" },
+                { en: "water", he: "מים", pr: "ווטר", emoji: "💧" },
+                { en: "way", he: "דרך", pr: "וואי", emoji: "🛣️" },
+                { en: "weather", he: "מזג אוויר", pr: "וות'ר", emoji: "☁️" },
+                { en: "week", he: "שבוע", pr: "וויק", emoji: "📅" },
+                { en: "well", he: "היטב/באר", pr: "וול", emoji: "🆗" },
+                { en: "wet", he: "רטוב", pr: "וואט", emoji: "💦" },
+                { en: "what", he: "מה", pr: "וואט", emoji: "❓" },
+                { en: "when", he: "מתי", pr: "וון", emoji: "🕒" },
+                { en: "where", he: "איפה", pr: "וור", emoji: "📍" },
+                { en: "white", he: "לבן", pr: "וואייט", emoji: "⚪" },
+                { en: "why", he: "למה", pr: "וואי", emoji: "❓" },
+                { en: "wind", he: "רוח", pr: "ווינד", emoji: "🌬️" },
+                { en: "with", he: "עם", pr: "וות'", emoji: "🤝" },
+                { en: "woman", he: "אישה", pr: "וומן", emoji: "👩" },
+                { en: "word", he: "מילה", pr: "וורד", emoji: "🔤" },
+                { en: "work", he: "לעבוד", pr: "וורק", emoji: "💼" },
+                { en: "world", he: "עולם", pr: "וורלד", emoji: "🌍" },
+                { en: "write", he: "לכתוב", pr: "רייט", emoji: "✍️" },
+                { en: "year", he: "שנה", pr: "ייר", emoji: "🗓️" },
+                { en: "yellow", he: "צהוב", pr: "יילו", emoji: "🟡" },
+                { en: "yes", he: "כן", pr: "יס", emoji: "✅" },
+                { en: "you", he: "אתה/את", pr: "יו", emoji: "👤" },
+                { en: "young", he: "צעיר", pr: "יאנג", emoji: "👶" },
+                { en: "your", he: "שלך", pr: "יור", emoji: "👉" },
+                { en: "School", he: "בית ספר", pr: "סקול", emoji: "🏫" },
+                { en: "Name", he: "שם", pr: "ניים", emoji: "📛" },
+                { en: "Desk", he: "שולחן כתיבה", pr: "דסק", emoji: "🪑" },
+                { en: "Friend", he: "חבר", pr: "פרינד", emoji: "👫" },
+                { en: "Teacher", he: "מורה", pr: "טיצ'ר", emoji: "👨‍🏫" },
+                { en: "Mouse", he: "עכבר", pr: "מאוס", emoji: "🐭" },
+                { en: "Pencil", he: "עיפרון", pr: "פנסיל", emoji: "✏️" },
+                { en: "Computer", he: "מחשב", pr: "קומפיוטר", emoji: "💻" },
+                { en: "Book", he: "ספר", pr: "בוק", emoji: "📖" },
+                { en: "Bag", he: "תיק", pr: "בג", emoji: "🎒" }
+            ], 
+            ofri: [
+                { en: "At", he: "ב", pr: "את", emoji: "📍" }, { en: "School", he: "בית ספר", pr: "סקול", emoji: "🏫" }, { en: "Name", he: "שם", pr: "ניים", emoji: "📛" }, { en: "Your", he: "שלך", pr: "יור", emoji: "👉" }, { en: "By", he: "ליד", pr: "באיי", emoji: "➡️" }, { en: "You", he: "אתה", pr: "יו", emoji: "👤" }, { en: "Live", he: "לחיות", pr: "ליב", emoji: "🏠" }, { en: "Game", he: "משחק", pr: "גיים", emoji: "🎮" }, { en: "What", he: "מה", pr: "וואט", emoji: "❓" }, { en: "Where", he: "איפה", pr: "וואר", emoji: "🗺️" }, { en: "Ball", he: "כדור", pr: "בול", emoji: "⚽" }, { en: "Desk", he: "שולחן כתיבה", pr: "דסק", emoji: "🪑" }, { en: "House", he: "בית", pr: "האוס", emoji: "🏡" }, { en: "New", he: "חדש", pr: "ניו", emoji: "✨" }, { en: "Friend", he: "חבר", pr: "פרינד", emoji: "👫" }, { en: "Grade", he: "כיתה", pr: "גרייד", emoji: "🎓" }, { en: "Town", he: "עיירה", pr: "טאון", emoji: "🏘️" }, { en: "Teacher", he: "מורה", pr: "טיצ'ר", emoji: "👨‍🏫" }, { en: "Down", he: "למטה", pr: "דאון", emoji: "⬇️" }, { en: "Brown", he: "חום", pr: "בראון", emoji: "🟤" }, { en: "Mouse", he: "עכבר", pr: "מאוס", emoji: "🐭" }, { en: "Pool", he: "בריכה", pr: "פול", emoji: "🏊" }, { en: "Cool", he: "קר", pr: "קול", emoji: "🧊" }, { en: "Test", he: "מבחן", pr: "טסט", emoji: "📝" }, { en: "Girl", he: "ילדה", pr: "גירל", emoji: "👧" }, { en: "Bag", he: "תיק", pr: "בג", emoji: "🎒" }, { en: "Tall", he: "גבוה", pr: "טול", emoji: "📏" }, { en: "In", he: "בתוך", pr: "אין", emoji: "📦" }, { en: "I am", he: "אני", pr: "איי אם", emoji: "🙋" }, { en: "Orange", he: "כתום", pr: "אורנג'", emoji: "🟠" }, { en: "Hat", he: "כובע", pr: "האט", emoji: "🎩" }, { en: "Blue", he: "כחול", pr: "בלו", emoji: "🔵" }, { en: "Small", he: "קטן", pr: "סמול", emoji: "🔻" }, { en: "Old", he: "מבוגר", pr: "אולד", emoji: "👴" }, { en: "How old are you", he: "בן כמה אתה", pr: "האו אולד אר יו", emoji: "🎂" }, { en: "Sister", he: "אחות", pr: "סיסטר", emoji: "👧" }, { en: "Brother", he: "אח", pr: "ברודר", emoji: "👦" }, { en: "Hamburger", he: "המבורגר", pr: "המבורגר", emoji: "🍔" }, { en: "How", he: "איך", pr: "האו", emoji: "🤔" }, { en: "Three", he: "שלוש", pr: "סרי", emoji: "3️⃣" }, { en: "Go", he: "לך", pr: "גו", emoji: "🚶" }, { en: "Talk", he: "לדבר", pr: "טוק", emoji: "💬" }, { en: "Family", he: "משפחה", pr: "פמילי", emoji: "👨‍👩‍👧‍👦" }, { en: "Bird", he: "ציפור", pr: "בירד", emoji: "🐦" }, { en: "Fly", he: "לעוף", pr: "פליי", emoji: "✈️" }, { en: "English", he: "אנגלית", pr: "אינגליש", emoji: "🇬🇧" }, { en: "Lesson", he: "שיעור", pr: "לסון", emoji: "📚" }, { en: "Want", he: "רוצה", pr: "וונט", emoji: "🙏" }, { en: "Nice", he: "נחמד", pr: "נייס", emoji: "😊" }, { en: "Shop", he: "חנות", pr: "שופ", emoji: "🛍️" }, { en: "Fish", he: "דג", pr: "פיש", emoji: "🐟" }, { en: "Class", he: "כיתה", pr: "קלס", emoji: "🎓" }, { en: "Dress", he: "שמלה", pr: "דרס", emoji: "👗" }, { en: "Sir", he: "אדון", pr: "סיר", emoji: "🎩" }, { en: "Happy", he: "שמח", pr: "הפי", emoji: "😄" }, { en: "Sunny", he: "שמשי", pr: "סאני", emoji: "☀️" }, { en: "Yellow", he: "צהוב", pr: "יילו", emoji: "🟡" }, { en: "Likes", he: "אוהב", pr: "לייקס", emoji: "❤️" }, { en: "Fun", he: "כיף", pr: "פאן", emoji: "🎉" }, { en: "Dog", he: "כלב", pr: "דוג", emoji: "🐕" }, { en: "Cat", he: "חתול", pr: "קאט", emoji: "🐈" }, { en: "Rabbit", he: "ארנב", pr: "רביט", emoji: "🐰" }, { en: "Age", he: "גיל", pr: "אייג'", emoji: "🎂" }, { en: "Pet", he: "חיית מחמד", pr: "פט", emoji: "🐾" }, { en: "Book", he: "ספר", pr: "בוק", emoji: "📖" }, { en: "Have", he: "יש", pr: "האב", emoji: "✅" }, { en: "Pencil", he: "עיפרון", pr: "פנסיל", emoji: "✏️" }, { en: "Don't", he: "לא", pr: "דונט", emoji: "🚫" }, { en: "Paper", he: "נייר", pr: "פפר", emoji: "📄" }, { en: "Lets go", he: "בוא נלך", pr: "לטס גו", emoji: "🏃" }, { en: "Look", he: "תראה", pr: "לוק", emoji: "👀" }, { en: "Good", he: "טוב", pr: "גוד", emoji: "👍" }, { en: "Board", he: "לוח", pr: "בורד", emoji: "📋" }, { en: "Eraser", he: "מחק", pr: "אירייזר", emoji: "🧹" }, { en: "Need", he: "צריך", pr: "ניד", emoji: "🆘" }, { en: "Chair", he: "כסא", pr: "צ'ייר", emoji: "💺" }, { en: "Notebook", he: "מחברת", pr: "נוטבוק", emoji: "📓" }, { en: "Homework", he: "שיעורי בית", pr: "הומוורק", emoji: "📝" }, { en: "Lunch", he: "ארוחת צהריים", pr: "לאנץ'", emoji: "🍽️" }, { en: "Green", he: "ירוק", pr: "גרין", emoji: "🟢" }, { en: "Phone", he: "טלפון", pr: "פון", emoji: "📱" }, { en: "Number", he: "מספר", pr: "נמבר", emoji: "🔢" }, { en: "Street", he: "רחוב", pr: "סטריט", emoji: "אלפנט", emoji: "🐘" }, { en: "Please", he: "בבקשה", pr: "פליז", emoji: "🙏" }, { en: "Food", he: "אוכל", pr: "פוד", emoji: "🍴" }, { en: "Write", he: "כותב", pr: "רייט", emoji: "✍️" }, { en: "Pupil", he: "תלמיד", pr: "פיופיל", emoji: "👨‍🎓" }, { en: "Meet", he: "פוגש", pr: "מיט", emoji: "🤝" }, { en: "He", he: "הוא", pr: "הי", emoji: "👨" }, { en: "She", he: "היא", pr: "שי", emoji: "👩" }, { en: "White", he: "לבן", pr: "וואייט", emoji: "⚪" }, { en: "Math", he: "חשבון", pr: "מאט'", emoji: "🔢" }, { en: "Music", he: "מוזיקה", pr: "מיוזיק", emoji: "🎵" }, { en: "Park", he: "פארק", pr: "פארק", emoji: "🌳" }, { en: "Morning", he: "בוקר", pr: "מורנינג", emoji: "🌅" }, { en: "Party", he: "מסיבה", pr: "פרטי", emoji: "🎊" }, { en: "Help", he: "עזרה", pr: "הלפ", emoji: "🆘" }, { en: "Computer", he: "מחשב", pr: "קומפיוטר", emoji: "💻" }, { en: "Learn", he: "למד", pr: "לרן", emoji: "📚" }, { en: "Friday", he: "שישי", pr: "פריידיי", emoji: "📅" }
+            ],
+            animals: [{ en: "Dog", he: "כלב", pr: "דוג", emoji: "🐕" }, { en: "Cat", he: "חתול", pr: "קט", emoji: "🐈" }, { en: "Bird", he: "ציפור", pr: "בירד", emoji: "🐦" }, { en: "Fish", he: "דג", pr: "פיש", emoji: "🐟" }, { en: "Rabbit", he: "ארנב", pr: "רביט", emoji: "🐰" }, { en: "Mouse", he: "עכבר", pr: "מאוס", emoji: "🐭" }, { en: "Elephant", he: "פיל", pr: "אלפנט", emoji: "🐘" }, { en: "Lion", he: "אריה", pr: "ליון", emoji: "🦁" }, { en: "Tiger", he: "נמר", pr: "טייגר", emoji: "🐯" }, { en: "Bear", he: "דוב", pr: "בר", emoji: "🐻" }, { en: "Monkey", he: "קוף", pr: "מאנקי", emoji: "🐵" }, { en: "Giraffe", he: "ג'ירפה", pr: "ג'ירף", emoji: "🦒" }, { en: "Zebra", he: "זברה", pr: "זיברה", emoji: "🦓" }, { en: "Horse", he: "סוס", pr: "הורס", emoji: "🐴" }, { en: "Cow", he: "פרה", pr: "קאו", emoji: "🐄" }, { en: "Sheep", he: "כבשה", pr: "שיפ", emoji: "🐑" }, { en: "Goat", he: "עז", pr: "גוט", emoji: "🐐" }, { en: "Pig", he: "חזיר", pr: "פיג", emoji: "🐷" }, { en: "Chicken", he: "תרנגולת", pr: "צ'יקן", emoji: "🐔" }, { en: "Duck", he: "ברווז", pr: "דאק", emoji: "🦆" }, { en: "Turkey", he: "הודו", pr: "טרקי", emoji: "🦃" }, { en: "Penguin", he: "פינגווין", pr: "פנגווין", emoji: "🐧" }, { en: "Owl", he: "ינשוף", pr: "אאול", emoji: "🦉" }, { en: "Eagle", he: "נשר", pr: "איגל", emoji: "🦅" }, { en: "Parrot", he: "תוכי", pr: "פרוט", emoji: "🦜" }, { en: "Frog", he: "צפרדע", pr: "פרוג", emoji: "🐸" }, { en: "Snake", he: "נחש", pr: "סנייק", emoji: "🐍" }, { en: "Turtle", he: "צב", pr: "טרטל", emoji: "🐢" }, { en: "Crocodile", he: "תנין", pr: "קרוקודייל", emoji: "🐊" }, { en: "Butterfly", he: "פרפר", pr: "באטרפליי", emoji: "🦋" }, { en: "Bee", he: "דבורה", pr: "בי", emoji: "🐝" }, { en: "Ant", he: "נמלה", pr: "אנט", emoji: "🐜" }, { en: "Spider", he: "עכביש", pr: "ספיידר", emoji: "🕷️" }, { en: "Dolphin", he: "דולפין", pr: "דולפין", emoji: "🐬" }, { en: "Whale", he: "לוויתן", pr: "וויל", emoji: "🐋" }, { en: "Shark", he: "כריש", pr: "שארק", emoji: "🦈" }, { en: "Octopus", he: "תמנון", pr: "אוקטופוס", emoji: "🐙" }, { en: "Crab", he: "סרטן", pr: "קרב", emoji: "🦀" }, { en: "Kangaroo", he: "קנגרו", pr: "קנגרו", emoji: "🦘" }, { en: "Koala", he: "קואלה", pr: "קואלה", emoji: "🐨" }, { en: "Panda", he: "פנדה", pr: "פנדה", emoji: "🐼" }, { en: "Camel", he: "גמל", pr: "קמל", emoji: "🐫" }, { en: "Deer", he: "צבי", pr: "דיר", emoji: "🦌" }, { en: "Squirrel", he: "סנאי", pr: "סקווירל", emoji: "🐿️" }, { en: "Wolf", he: "זאב", pr: "וולף", emoji: "🐺" }, { en: "Fox", he: "שועל", pr: "פוקס", emoji: "🦊" }, { en: "Hamster", he: "אוגר", pr: "המסטר", emoji: "🐹" }, { en: "Peacock", he: "טווס", pr: "פיקוק", emoji: "🦚" }, { en: "Flamingo", he: "פלמינגו", pr: "פלמינגו", emoji: "🦩" }, { en: "Rhino", he: "קרנף", pr: "ריינו", emoji: "🦏" }, { en: "Hippo", he: "היפופוטם", pr: "היפו", emoji: "🦛" }, { en: "Cheetah", he: "ברדלס", pr: "צ'יטה", emoji: "🐆" }, { en: "Gorilla", he: "גורילה", pr: "גורילה", emoji: "🦍" }], colors: [{ en: "Red", he: "אדום", pr: "רד", emoji: "🔴" }, { en: "Blue", he: "כחול", pr: "בלו", emoji: "🔵" }, { en: "Yellow", he: "צהוב", pr: "ילו", emoji: "🟡" }, { en: "Green", he: "ירוק", pr: "גרין", emoji: "🟢" }, { en: "Orange", he: "כתום", pr: "אורנג'", emoji: "🟠" }, { en: "Purple", he: "סגול", pr: "פרפל", emoji: "🟣" }, { en: "Pink", he: "ורוד", pr: "פינק", emoji: "🩷" }, { en: "Brown", he: "חום", pr: "בראון", emoji: "🟤" }, { en: "Black", he: "שחור", pr: "בלק", emoji: "⚫" }, { en: "White", he: "לבן", pr: "וויט", emoji: "⚪" }, { en: "Gray", he: "אפור", pr: "גריי", emoji: "🩶" }, { en: "Gold", he: "זהב", pr: "גולד", emoji: "🥇" }, { en: "Silver", he: "כסף", pr: "סילבר", emoji: "🥈" }, { en: "Beige", he: "בז'", pr: "בייג'", emoji: "🟤" }, { en: "Turquoise", he: "טורקיז", pr: "טורקווייז", emoji: "💎" }, { en: "Violet", he: "סגול בהיר", pr: "ויולט", emoji: "🟣" }, { en: "Indigo", he: "אינדיגו", pr: "אינדיגו", emoji: "🔵" }, { en: "Magenta", he: "מג'נטה", pr: "מג'נטה", emoji: "🩷" }, { en: "Cyan", he: "ציאן", pr: "סייאן", emoji: "🔵" }, { en: "Lime", he: "ירוק ליים", pr: "ליים", emoji: "🟢" }, { en: "Navy", he: "כחול כהה", pr: "נייבי", emoji: "🔵" }, { en: "Olive", he: "ירוק זית", pr: "אוליב", emoji: "🫒" }, { en: "Coral", he: "אלמוג", pr: "קורל", emoji: "🪸" }, { en: "Peach", he: "אפרסק", pr: "פיץ'", emoji: "🍑" }, { en: "Mint", he: "מנטה", pr: "מינט", emoji: "🌿" }, { en: "Lavender", he: "לבנדר", pr: "לבנדר", emoji: "💜" }, { en: "Cream", he: "קרם", pr: "קרים", emoji: "🍦" }, { en: "Ivory", he: "שנהב", pr: "איבורי", emoji: "🦷" }, { en: "Cherry", he: "דובדבן", pr: "צ'רי", emoji: "🍒" }, { en: "Rose", he: "ורד", pr: "רוז", emoji: "🌹" }, { en: "Lilac", he: "לילך", pr: "ליילק", emoji: "💜" }, { en: "Grape", he: "ענב", pr: "גרייפ", emoji: "🍇" }, { en: "Sky blue", he: "תכלת", pr: "סקיי בלו", emoji: "☁️" }, { en: "Emerald", he: "אמרלד", pr: "אמרלד", emoji: "💚" }, { en: "Jade", he: "ירוק ג'ייד", pr: "ג'ייד", emoji: "💚" }, { en: "Forest green", he: "ירוק יער", pr: "פורסט גרין", emoji: "🌲" }, { en: "Lemon", he: "לימון", pr: "למון", emoji: "🍋" }, { en: "Bronze", he: "ברונזה", pr: "ברונז", emoji: "🥉" }, { en: "Chocolate", he: "שוקולד", pr: "צ'וקולט", emoji: "🍫" }, { en: "Coffee", he: "קפה", pr: "קופי", emoji: "☕" }], pronouns: [{ en: "I", he: "אני", pr: "איי", emoji: "🙋" }, { en: "You", he: "אתה/את", pr: "יו", emoji: "👉" }, { en: "He", he: "הוא", pr: "הי", emoji: "👨" }, { en: "She", he: "היא", pr: "שי", emoji: "👩" }, { en: "It", he: "זה/זו", pr: "איט", emoji: "👈" }, { en: "We", he: "אנחנו", pr: "ווי", emoji: "👥" }, { en: "They", he: "הם/הן", pr: "דיי", emoji: "👫" }, { en: "Me", he: "אותי", pr: "מי", emoji: "🙋" }, { en: "Him", he: "אותו", pr: "הים", emoji: "👨" }, { en: "Her", he: "אותה", pr: "הר", emoji: "👩" }, { en: "Us", he: "אותנו", pr: "אס", emoji: "👥" }, { en: "Them", he: "אותם", pr: "דם", emoji: "👫" }, { en: "My", he: "שלי", pr: "מיי", emoji: "🏠" }, { en: "Your", he: "שלך", pr: "יור", emoji: "👉" }, { en: "His", he: "שלו", pr: "היז", emoji: "👨" }, { en: "Her", he: "שלה", pr: "הר", emoji: "👩" }, { en: "Our", he: "שלנו", pr: "אואר", emoji: "👥" }, { en: "Their", he: "שלהם", pr: "דייר", emoji: "👫" }, { en: "Mine", he: "שלי", pr: "מיין", emoji: "✋" }, { en: "Yours", he: "שלך", pr: "יורז", emoji: "👉" }, { en: "This", he: "זה", pr: "דיס", emoji: "👈" }, { en: "That", he: "ההוא", pr: "דאט", emoji: "☝️" }, { en: "Who", he: "מי", pr: "הו", emoji: "❓" }, { en: "What", he: "מה", pr: "וואט", emoji: "❓" }, { en: "Which", he: "איזה", pr: "וויץ'", emoji: "🤔" }, { en: "Anyone", he: "מישהו", pr: "אניוואן", emoji: "👤" }, { en: "Someone", he: "מישהו", pr: "סאמוואן", emoji: "👤" }, { en: "Everyone", he: "כולם", pr: "אבריוואן", emoji: "👥" }, { en: "Nobody", he: "אף אחד", pr: "נובדי", emoji: "🚫" }, { en: "Something", he: "משהו", pr: "סאמת'ינג", emoji: "📦" }, { en: "Nothing", he: "שום דבר", pr: "נאת'ינג", emoji: "🚫" }, { en: "Everything", he: "הכל", pr: "אברית'ינג", emoji: "🌍" }, { en: "All", he: "הכל", pr: "אול", emoji: "🌍" }], numbers: [{ en: "Zero", he: "אפס", pr: "זירו", emoji: "0️⃣" }, { en: "One", he: "אחד", pr: "וואן", emoji: "1️⃣" }, { en: "Two", he: "שניים", pr: "טו", emoji: "2️⃣" }, { en: "Three", he: "שלוש", pr: "סרי", emoji: "3️⃣" }, { en: "Four", he: "ארבע", pr: "פור", emoji: "4️⃣" }, { en: "Five", he: "חמש", pr: "פייב", emoji: "5️⃣" }, { en: "Six", he: "שש", pr: "סיקס", emoji: "6️⃣" }, { en: "Seven", he: "שבע", pr: "סבן", emoji: "7️⃣" }, { en: "Eight", he: "שמונה", pr: "אייט", emoji: "8️⃣" }, { en: "Nine", he: "תשע", pr: "ניין", emoji: "9️⃣" }, { en: "Ten", he: "עשר", pr: "טן", emoji: "🔟" }, { en: "Eleven", he: "אחד עשר", pr: "אלבן", emoji: "1️⃣1️⃣" }, { en: "Twelve", he: "שנים עשר", pr: "טוולב", emoji: "1️⃣2️⃣" }, { en: "Twenty", he: "עשרים", pr: "טוונטי", emoji: "2️⃣0️⃣" }, { en: "Thirty", he: "שלושים", pr: "ת'רטי", emoji: "3️⃣0️⃣" }, { en: "Forty", he: "ארבעים", pr: "פורטי", emoji: "4️⃣0️⃣" }, { en: "Fifty", he: "חמישים", pr: "פיפטי", emoji: "5️⃣0️⃣" }, { en: "Hundred", he: "מאה", pr: "הנדרד", emoji: "💯" }, { en: "Thousand", he: "אלף", pr: "ת'אוזנד", emoji: "🔢" }, { en: "Million", he: "מיליון", pr: "מיליון", emoji: "💰" }, { en: "First", he: "ראשון", pr: "פרסט", emoji: "🥇" }, { en: "Second", he: "שני", pr: "סקנד", emoji: "🥈" }, { en: "Third", he: "שלישי", pr: "ת'רד", emoji: "🥉" }, { en: "Half", he: "חצי", pr: "האף", emoji: "½" }, { en: "Plus", he: "פלוס", pr: "פלאס", emoji: "➕" }, { en: "Minus", he: "מינוס", pr: "מיינס", emoji: "➖" }, { en: "Equals", he: "שווה", pr: "איקווולז", emoji: "🟰" }, { en: "Percent", he: "אחוז", pr: "פרסנט", emoji: "💯" }], verbs: [{ en: "Go", he: "ללכת", pr: "גו", emoji: "🚶" }, { en: "Come", he: "לבוא", pr: "קאם", emoji: "👋" }, { en: "Run", he: "לרוץ", pr: "ראן", emoji: "🏃" }, { en: "Walk", he: "ללכת", pr: "ווק", emoji: "🚶" }, { en: "Jump", he: "לקפוץ", pr: "ג'אמפ", emoji: "🤸" }, { en: "Fly", he: "לעוף", pr: "פליי", emoji: "✈️" }, { en: "Swim", he: "לשחות", pr: "סווים", emoji: "🏊" }, { en: "Eat", he: "לאכול", pr: "איט", emoji: "🍽️" }, { en: "Drink", he: "לשתות", pr: "דרינק", emoji: "🥤" }, { en: "Sleep", he: "לישון", pr: "סליפ", emoji: "😴" }, { en: "Wake", he: "להתעורר", pr: "וויק", emoji: "⏰" }, { en: "Play", he: "לשחק", pr: "פליי", emoji: "🎮" }, { en: "Work", he: "לעבוד", pr: "וורק", emoji: "💼" }, { en: "Study", he: "ללמוד", pr: "סטאדי", emoji: "📚" }, { en: "Learn", he: "ללמוד", pr: "לרן", emoji: "🎓" }, { en: "Teach", he: "ללמד", pr: "טיץ'", emoji: "👨‍🏫" }, { en: "Read", he: "לקרוא", pr: "ריד", emoji: "📖" }, { en: "Write", he: "לכתוב", pr: "רייט", emoji: "✍️" }, { en: "Draw", he: "לצייר", pr: "דרו", emoji: "🎨" }, { en: "Paint", he: "לצבוע", pr: "פיינט", emoji: "🖌️" }, { en: "Sing", he: "לשיר", pr: "סינג", emoji: "🎤" }, { en: "Dance", he: "לרקוד", pr: "דאנס", emoji: "💃" }, { en: "Listen", he: "להקשיב", pr: "ליסן", emoji: "👂" }, { en: "Hear", he: "לשמוע", pr: "היר", emoji: "👂" }, { en: "See", he: "לראות", pr: "סי", emoji: "👁️" }, { en: "Look", he: "להסתכל", pr: "לוק", emoji: "👀" }, { en: "Watch", he: "לצפות", pr: "וואץ'", emoji: "📺" }, { en: "Talk", he: "לדבר", pr: "טוק", emoji: "💬" }, { en: "Speak", he: "לדבר", pr: "ספיק", emoji: "🗣️" }, { en: "Say", he: "לומר", pr: "סיי", emoji: "💬" }, { en: "Tell", he: "לספר", pr: "טל", emoji: "📢" }, { en: "Ask", he: "לשאול", pr: "אסק", emoji: "❓" }, { en: "Answer", he: "לענות", pr: "אנסר", emoji: "💡" }, { en: "Think", he: "לחשוב", pr: "ת'ינק", emoji: "🤔" }, { en: "Know", he: "לדעת", pr: "נו", emoji: "🧠" }, { en: "Understand", he: "להבין", pr: "אנדרסטנד", emoji: "💡" }, { en: "Remember", he: "לזכור", pr: "ריממבר", emoji: "🧠" }, { en: "Forget", he: "לשכוח", pr: "פורגט", emoji: "🤷" }, { en: "Love", he: "לאהוב", pr: "לאב", emoji: "❤️" }, { en: "Like", he: "לחבב", pr: "לייק", emoji: "👍" }, { en: "Hate", he: "לשנוא", pr: "הייט", emoji: "👎" }, { en: "Want", he: "לרצות", pr: "וונט", emoji: "🙏" }, { en: "Need", he: "להזדקק", pr: "ניד", emoji: "🆘" }, { en: "Help", he: "לעזור", pr: "הלפ", emoji: "🤝" }, { en: "Give", he: "לתת", pr: "גיב", emoji: "🎁" }, { en: "Take", he: "לקחת", pr: "טייק", emoji: "✋" }, { en: "Bring", he: "להביא", pr: "ברינג", emoji: "🚚" }, { en: "Get", he: "להשיג", pr: "גט", emoji: "✅" }, { en: "Make", he: "לעשות", pr: "מייק", emoji: "🔨" }, { en: "Do", he: "לעשות", pr: "דו", emoji: "✔️" }, { en: "Buy", he: "לקנות", pr: "ביי", emoji: "🛒" }, { en: "Open", he: "לפתוח", pr: "אופן", emoji: "🔓" }, { en: "Close", he: "לסגור", pr: "קלוז", emoji: "🔒" }, { en: "Start", he: "להתחיל", pr: "סטארט", emoji: "▶️" }, { en: "Stop", he: "לעצור", pr: "סטופ", emoji: "⏹️" }, { en: "Build", he: "לבנות", pr: "בילד", emoji: "🏗️" }, { en: "Break", he: "לשבור", pr: "ברייק", emoji: "💥" }, { en: "Fix", he: "לתקן", pr: "פיקס", emoji: "🔧" }, { en: "Clean", he: "לנקות", pr: "קלין", emoji: "🧹" }, { en: "Cook", he: "לבשל", pr: "קוק", emoji: "🍳" }, { en: "Cut", he: "לחתוך", pr: "קאט", emoji: "✂️" }, { en: "Feel", he: "להרגיש", pr: "פיל", emoji: "💖" }, { en: "Laugh", he: "לצחוק", pr: "לאף", emoji: "😄" }, { en: "Cry", he: "לבכות", pr: "קריי", emoji: "😢" }, { en: "Smile", he: "לחייך", pr: "סמייל", emoji: "😊" }, { en: "Call", he: "להתקשר", pr: "קול", emoji: "📞" }, { en: "Send", he: "לשלוח", pr: "סנד", emoji: "📤" }, { en: "Show", he: "להראות", pr: "שו", emoji: "👉" }, { en: "Try", he: "לנסות", pr: "טריי", emoji: "💪" }], food: [{ en: "Apple", he: "תפוח", pr: "אפל", emoji: "🍎" }, { en: "Banana", he: "בננה", pr: "בננה", emoji: "🍌" }, { en: "Orange", he: "תפוז", pr: "אורנג'", emoji: "🍊" }, { en: "Grape", he: "ענב", pr: "גרייפ", emoji: "🍇" }, { en: "Strawberry", he: "תות", pr: "סטרוברי", emoji: "🍓" }, { en: "Watermelon", he: "אבטיח", pr: "ווטרמלון", emoji: "🍉" }, { en: "Peach", he: "אפרסק", pr: "פיץ'", emoji: "🍑" }, { en: "Pear", he: "אגס", pr: "פר", emoji: "🍐" }, { en: "Cherry", he: "דובדבן", pr: "צ'רי", emoji: "🍒" }, { en: "Lemon", he: "לימון", pr: "למון", emoji: "🍋" }, { en: "Mango", he: "מנגו", pr: "מנגו", emoji: "🥭" }, { en: "Pineapple", he: "אננס", pr: "פיינאפל", emoji: "🍍" }, { en: "Kiwi", he: "קיווי", pr: "קיווי", emoji: "🥝" }, { en: "Coconut", he: "קוקוס", pr: "קוקונאט", emoji: "🥥" }, { en: "Avocado", he: "אבוקדו", pr: "אבוקדו", emoji: "🥑" }, { en: "Tomato", he: "עגבנייה", pr: "טומייטו", emoji: "🍅" }, { en: "Cucumber", he: "מלפפון", pr: "קיוקמבר", emoji: "🥒" }, { en: "Carrot", he: "גזר", pr: "קרוט", emoji: "🥕" }, { en: "Potato", he: "תפוח אדמה", pr: "פוטייטו", emoji: "🥔" }, { en: "Onion", he: "בצל", pr: "אניון", emoji: "🧅" }, { en: "Garlic", he: "שום", pr: "גרליק", emoji: "🧄" }, { en: "Pepper", he: "פלפל", pr: "פפר", emoji: "🌶️" }, { en: "Lettuce", he: "חסה", pr: "לטוס", emoji: "🥬" }, { en: "Broccoli", he: "ברוקולי", pr: "ברוקולי", emoji: "🥦" }, { en: "Corn", he: "תירס", pr: "קורן", emoji: "🌽" }, { en: "Rice", he: "אורז", pr: "רייס", emoji: "🍚" }, { en: "Pasta", he: "פסטה", pr: "פסטה", emoji: "🍝" }, { en: "Bread", he: "לחם", pr: "ברד", emoji: "🍞" }, { en: "Cake", he: "עוגה", pr: "קייק", emoji: "🍰" }, { en: "Cookie", he: "עוגייה", pr: "קוקי", emoji: "🍪" }, { en: "Chocolate", he: "שוקולד", pr: "צ'וקולט", emoji: "🍫" }, { en: "Candy", he: "ממתק", pr: "קנדי", emoji: "🍬" }, { en: "Ice cream", he: "גלידה", pr: "איס קרים", emoji: "🍦" }, { en: "Pizza", he: "פיצה", pr: "פיצה", emoji: "🍕" }, { en: "Hamburger", he: "המבורגר", pr: "המבורגר", emoji: "🍔" }, { en: "Hot dog", he: "נקניקייה", pr: "הוט דוג", emoji: "🌭" }, { en: "Sandwich", he: "כריך", pr: "סנדוויץ'", emoji: "🥪" }, { en: "Salad", he: "סלט", pr: "סלד", emoji: "🥗" }, { en: "Soup", he: "מרק", pr: "סופ", emoji: "🍲" }, { en: "Chicken", he: "עוף", pr: "צ'יקן", emoji: "🍗" }, { en: "Fish", he: "דג", pr: "פיש", emoji: "🐟" }, { en: "Egg", he: "ביצה", pr: "אג", emoji: "🥚" }, { en: "Cheese", he: "גבינה", pr: "צ'יז", emoji: "🧀" }, { en: "Milk", he: "חלב", pr: "מילק", emoji: "🥛" }, { en: "Butter", he: "חמאה", pr: "באטר", emoji: "🧈" }, { en: "Honey", he: "דבש", pr: "האני", emoji: "🍯" }, { en: "Sugar", he: "סוכר", pr: "שוגר", emoji: "🧂" }, { en: "Salt", he: "מלח", pr: "סולט", emoji: "🧂" }, { en: "Juice", he: "מיץ", pr: "ג'וס", emoji: "🧃" }, { en: "Water", he: "מים", pr: "ווטר", emoji: "💧" }, { en: "Tea", he: "תה", pr: "טי", emoji: "🍵" }, { en: "Coffee", he: "קפה", pr: "קופי", emoji: "☕" }], family: [{ en: "Mother", he: "אמא", pr: "מאד'ר", emoji: "👩" }, { en: "Father", he: "אבא", pr: "פאד'ר", emoji: "👨" }, { en: "Sister", he: "אחות", pr: "סיסטר", emoji: "👧" }, { en: "Brother", he: "אח", pr: "ברד'ר", emoji: "👦" }, { en: "Grandmother", he: "סבתא", pr: "גרנדמאד'ר", emoji: "👵" }, { en: "Grandfather", he: "סבא", pr: "גרנדפאד'ר", emoji: "👴" }, { en: "Aunt", he: "דודה", pr: "אנט", emoji: "👩" }, { en: "Uncle", he: "דוד", pr: "אנקל", emoji: "👨" }, { en: "Cousin", he: "בן דוד", pr: "קאזן", emoji: "👫" }, { en: "Daughter", he: "בת", pr: "דוטר", emoji: "👧" }, { en: "Son", he: "בן", pr: "סאן", emoji: "👦" }, { en: "Wife", he: "אישה", pr: "וויף", emoji: "👰" }, { en: "Husband", he: "בעל", pr: "האזבנד", emoji: "🤵" }, { en: "Parent", he: "הורה", pr: "פרנט", emoji: "👨‍👩‍👧" }, { en: "Child", he: "ילד", pr: "צ'יילד", emoji: "👶" }, { en: "Baby", he: "תינוק", pr: "בייבי", emoji: "👶" }, { en: "Teenager", he: "נער", pr: "טינאייג'ר", emoji: "🧑" }, { en: "Adult", he: "מבוגר", pr: "אדולט", emoji: "👨" }, { en: "Twin", he: "תאום", pr: "טווין", emoji: "👯" }, { en: "Family", he: "משפחה", pr: "פמילי", emoji: "👨‍👩‍👧‍👦" }, { en: "Married", he: "נשוי", pr: "מריד", emoji: "💍" }, { en: "Single", he: "רווק", pr: "סינגל", emoji: "💔" }, { en: "Partner", he: "בן זוג", pr: "פרטנר", emoji: "💑" }, { en: "Bride", he: "כלה", pr: "ברייד", emoji: "👰" }, { en: "Groom", he: "חתן", pr: "גרום", emoji: "🤵" }, { en: "Wedding", he: "חתונה", pr: "ודינג", emoji: "💒" }, { en: "Birthday", he: "יום הולדת", pr: "ברת'דיי", emoji: "🎂" }]
+        }; 
+        
+        const allWords = Object.values(wordBanks).flat();
+        
+        let currentTopic = null, currentDirection = 'en-he', currentPool = [], mistakes = [], currentWord = {}, score = 0, questionsAnswered = 0, currentAttempts = 3; 
+        
+        let persistentPool = [];
+        let originalCategorySize = 0; // גודל המאגר המקורי לחישוב מנייה
+        let maxQuestions = 10; // מעכשיו הוא משתנה
+        
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)(); 
+
+        function playSoftSound(t) { const e = audioCtx.createOscillator(), o = audioCtx.createGain(); e.type = 'sine', 'correct' === t ? (e.frequency.setValueAtTime(880, audioCtx.currentTime), o.gain.setValueAtTime(.05, audioCtx.currentTime), o.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .4)) : (e.frequency.setValueAtTime(220, audioCtx.currentTime), o.gain.setValueAtTime(.05, audioCtx.currentTime), o.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .3)), e.connect(o), o.connect(audioCtx.destination), e.start(), e.stop(audioCtx.currentTime + .4) } 
+        
+        function speakWord() { window.speechSynthesis.cancel(); const t = new SpeechSynthesisUtterance('en-he' === currentDirection ? currentWord.en : currentWord.he); t.lang = 'en-he' === currentDirection ? 'en-US' : 'he-IL', t.rate = .8, window.speechSynthesis.speak(t) } 
+
+        function selectTopic(t) { 
+            if (currentTopic !== t) {
+                currentTopic = t;
+                const source = 'all' === t ? allWords : wordBanks[t];
+                persistentPool = [...source];
+                originalCategorySize = source.length;
+            }
+            
+            document.getElementById('topic-screen').style.display = 'none', document.getElementById('direction-screen').style.display = 'block'; 
+            const e = { inbar_test: '💎 מבחן ענבר (Unit 3)', ofri: '📚 מילים משיעור עופרי', ofri_test: 'מבחן אנגלית ד1', animals: '🦁 בעלי חיים', colors: '🎨 צבעים', pronouns: '👤 כינויים', numbers: '🔢 מספרים', verbs: '🏃 פעלים', food: '🍕 אוכל', family: '👨‍👩‍👧 משפחה', all: '🌟 כל המילים' };
+            document.getElementById('selected-topic-info').innerHTML = `נושא נבחר: <strong>${e[t]}</strong><br>מילים שנותרו במאגר: ${persistentPool.length} / ${originalCategorySize}` 
+        } 
+
+        function selectDirection(t) { currentDirection = t, document.getElementById('btn-en-he').classList.toggle('active', 'en-he' === t), document.getElementById('btn-he-en').classList.toggle('active', 'he-en' === t) } 
+
+        function startGame() { 
+            if (persistentPool.length === 0) {
+                const source = 'all' === currentTopic ? allWords : wordBanks[currentTopic];
+                persistentPool = [...source];
+            }
+            
+            currentPool = [...persistentPool];
+            mistakes = [], score = 0, questionsAnswered = 0, maxQuestions = 10; // סבב רגיל הוא 10
+            
+            document.getElementById('direction-screen').style.display = 'none', document.getElementById('game-screen').style.display = 'block', document.getElementById('speaker').style.display = 'en-he' === currentDirection ? 'inline-block' : 'none', nextQuestion() 
+        } 
+
+        function nextQuestion() { 
+            if (questionsAnswered >= maxQuestions || 0 === currentPool.length) return void showSummary(); 
+            questionsAnswered++, currentAttempts = 3, document.getElementById('question-count').innerText = `שאלה: ${questionsAnswered}/${maxQuestions}`, document.getElementById('attempts').innerText = 'ניסיונות נותרים: 3', document.getElementById('score').innerText = `ניקוד: ${score}`, document.getElementById('word-emoji').style.display = 'none'; 
+            
+            const t = Math.floor(Math.random() * currentPool.length); 
+            currentWord = currentPool[t]; 
+            
+            currentPool.splice(t, 1); 
+            const pIndex = persistentPool.findIndex(w => w.en === currentWord.en);
+            if (pIndex > -1) persistentPool.splice(pIndex, 1);
+
+            const e = 'en-he' === currentDirection ? currentWord.en : currentWord.he, o = 'en-he' === currentDirection ? 'he' : 'en'; 
+            document.getElementById('word').innerText = e, document.getElementById('feedback').innerText = ''; 
+            const n = 'all' === currentTopic ? allWords : wordBanks[currentTopic]; 
+            let r = [currentWord[o]]; 
+            for (; r.length < 4;) { let t = n[Math.floor(Math.random() * n.length)][o]; r.includes(t) || r.push(t) } 
+            r.sort((() => Math.random() - .5)); 
+            document.querySelectorAll('.opt-btn').forEach(((t, e) => { t.innerText = r[e], t.style.background = 'white', t.style.color = '#495057', t.style.borderColor = '#dee2e6', t.disabled = !1 })) 
+        } 
+
+        function checkAnswer(t) { const e = document.querySelectorAll('.opt-btn'), o = e[t], n = 'en-he' === currentDirection ? currentWord.he : currentWord.en; if (o.innerText === n) { score += 5 * currentAttempts, playSoftSound('correct'), document.getElementById('score').innerText = 'ניקוד: ' + score, o.style.background = '#ebfbee', o.style.color = '#2b8a3e', o.style.borderColor = '#2b8a3e', e.forEach((t => t.disabled = !0)); const t = document.getElementById('word-emoji'); t.innerText = currentWord.emoji, t.style.display = 'block', document.getElementById('feedback').innerText = 'כל הכבוד! ✨', document.getElementById('feedback').style.color = '#2b8a3e', setTimeout(nextQuestion, 1500) } else { mistakes.find((t => t.en === currentWord.en)) || mistakes.push(currentWord), currentAttempts--, playSoftSound('wrong'), o.style.background = '#fff5f5', o.style.color = '#e03131', o.style.borderColor = '#e03131', o.disabled = !0, currentAttempts > 0 ? (document.getElementById('attempts').innerText = `ניסיונות נותרים: ${currentAttempts}`, document.getElementById('feedback').innerText = 'לא בדיוק, נסה שוב...', document.getElementById('feedback').style.color = '#f59f00') : (document.getElementById('word-emoji').innerText = currentWord.emoji, document.getElementById('word-emoji').style.display = 'block', document.getElementById('attempts').innerText = 'ניסיונות נותרים: 0', document.getElementById('feedback').innerText = `הפירוש הנכון: ${n}`, document.getElementById('feedback').style.color = '#e03131', e.forEach((t => t.disabled = !0)), setTimeout(nextQuestion, 2500)) } } 
+
+        function showSummary() { 
+            document.getElementById('game-screen').style.display = 'none', document.getElementById('summary-screen').style.display = 'block', document.getElementById('final-score').innerText = `סיימת עם ${score} נקודות!`; 
+            
+            // עדכון המנייה של המאגר הכללי
+            const finishedCount = originalCategorySize - persistentPool.length;
+            document.getElementById('overall-progress').innerText = `סיימת ${finishedCount} מתוך ${originalCategorySize} המילים בקטגוריה!`;
+
+            const t = document.getElementById('mistakes-list'); 
+            if (mistakes.length > 0) {
+                t.innerHTML = "<h3 style='color:#fa5252'>מילים שצריך לחזק:</h3>";
+                mistakes.forEach((e => { t.innerHTML += `<div class='mistake-item'>${e.emoji} <b>${e.en}</b> = ${e.he}</div>` }));
+                document.getElementById('retry-mistakes-btn').style.display = 'block';
+            } else {
+                t.innerHTML = "<h3 style='color:#37b24d'>מושלם! ענית נכון על הכל! 🏆</h3>";
+                document.getElementById('retry-mistakes-btn').style.display = 'none';
+            }
+        } 
+
+        function startRetrySession() { 
+            currentPool = [...mistakes];
+            maxQuestions = mistakes.length; // המקסימום החדש הוא בדיוק מספר הטעויות
+            mistakes = [], score = 0, questionsAnswered = 0;
+            
+            document.getElementById('summary-screen').style.display = 'none', document.getElementById('game-screen').style.display = 'block', nextQuestion() 
+        } 
+
+        function resetGame() { 
+            if (persistentPool.length === 0) {
+                const source = 'all' === currentTopic ? allWords : wordBanks[currentTopic];
+                persistentPool = [...source];
+            }
+            startGame();
+        } 
+
+        function backToTopics() { document.getElementById('direction-screen').style.display = 'none', document.getElementById('game-screen').style.display = 'none', document.getElementById('summary-screen').style.display = 'none', document.getElementById('topic-screen').style.display = 'block' } 
+        
+        function backToDirection() { document.getElementById('game-screen').style.display = 'none', document.getElementById('direction-screen').style.display = 'block' }
+    </script>
+</body>
+
+</html>
