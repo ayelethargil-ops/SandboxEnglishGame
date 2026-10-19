@@ -266,6 +266,10 @@
                 <div class="topic-icon">💎</div>
                 <div>מבחן ענבר<br>Unit 3</div>
             </button>
+            <button class="topic-card" onclick="selectTopic('inbar_words')" style="background:linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); color: #5b2a86;">
+                <div class="topic-icon">✏️</div>
+                <div>מילים למבחן<br>ענבר</div>
+            </button>
             <button class="topic-card" onclick="selectTopic('ofri')">
                 <div class="topic-icon">📚</div>
                 <div>מילים משיעור<br>עופרי</div>
@@ -319,6 +323,8 @@
                     style="font-size:14px">אנגלית לעברית</span></button>
             <button class="direction-btn" onclick="selectDirection('he-en')" id="btn-he-en">🇮🇱 ➜ 🇬🇧<br><span
                     style="font-size:14px">עברית לאנגלית</span></button>
+            <button class="direction-btn" onclick="selectDirection('sentence')" id="btn-sentence" style="display:none">✍️<br><span
+                    style="font-size:14px">השלמת משפט</span></button>
         </div>
         <button class="action-btn" onclick="startGame()">🎮 התחל משחק!</button>
         <button class="back-btn" onclick="backToTopics()">← חזרה לנושאים</button>
@@ -447,6 +453,27 @@
                 { en: "Think of", he: "לחשוב על", pr: "ת'ינק אוף", emoji: "💡" },
                 { en: "Think so", he: "לחשוב כך", pr: "ת'ינק סו", emoji: "👍" }
             ],
+            inbar_words: [
+                { en: "Approximately", he: "בערך", pr: "אפרוקסימטלי", emoji: "🤏", s: "The train ride from Tel Aviv to Haifa takes _____ one hour.", d: ["Range", "Rich", "Loud"] },
+                { en: "Avoid", he: "להימנע", pr: "אבוייד", emoji: "🚫", s: "You should _____ eating too much sugar if you want to stay healthy.", d: ["Click", "Download", "Shopping"] },
+                { en: "Cafe", he: "בית קפה", pr: "קפה", emoji: "☕", s: "After school we met our friends at the _____ and ordered hot chocolate.", d: ["Culture", "Traffic", "Range"] },
+                { en: "Capital", he: "בירה", pr: "קפיטל", emoji: "🏛️", s: "Jerusalem is the _____ of Israel.", d: ["Island", "Culture", "Cafe"] },
+                { en: "Chance", he: "סיכוי / הזדמנות", pr: "צ'אנס", emoji: "🎲", s: "I studied hard, so I have a good _____ of passing the test.", d: ["Traffic", "Culture", "Cafe"] },
+                { en: "Click", he: "ללחוץ / קליק", pr: "קליק", emoji: "🖱️", s: "To open the program, _____ twice on the icon with the mouse.", d: ["Download", "Avoid", "Traffic"] },
+                { en: "Cooking", he: "בישול", pr: "קוקינג", emoji: "👨‍🍳", s: "My grandmother loves _____, and her kitchen always smells wonderful.", d: ["Traffic", "Island", "Chance"] },
+                { en: "Culture", he: "תרבות", pr: "קאלצ'ר", emoji: "🎭", s: "When you travel to another country, you can learn about its food, music and _____.", d: ["Traffic", "Chance", "Range"] },
+                { en: "Download", he: "להוריד (קובץ)", pr: "דאונלוד", emoji: "⬇️", s: "I need to _____ a new game to my phone, but the internet is very slow.", d: ["Click", "Avoid", "Shopping"] },
+                { en: "Drum", he: "תוף", pr: "דראם", emoji: "🥁", s: "My brother plays the _____ in a rock band.", d: ["Cafe", "Capital", "Culture"] },
+                { en: "In order to", he: "כדי ל...", pr: "אין אורדר טו", emoji: "🎯", s: "She woke up very early _____ catch the first bus.", d: ["Used to", "Avoid", "Rich"] },
+                { en: "Island", he: "אי", pr: "איילנד", emoji: "🏝️", s: "We took a boat to a small _____ in the middle of the sea.", d: ["Cafe", "Traffic", "Culture"] },
+                { en: "Loud", he: "רועש / חזק", pr: "לאוד", emoji: "📢", s: "Please turn down the music. It is too _____ and the neighbors are sleeping.", d: ["Rich", "Traditional", "Chance"] },
+                { en: "Range", he: "טווח / מגוון", pr: "ריינג'", emoji: "📏", s: "The store has a wide _____ of shoes in different colors and sizes.", d: ["Chance", "Culture", "Cafe"] },
+                { en: "Rich", he: "עשיר", pr: "ריץ'", emoji: "💰", s: "He won the lottery, so now he is very _____.", d: ["Loud", "Traditional", "Approximately"] },
+                { en: "Shopping", he: "קניות", pr: "שופינג", emoji: "🛍️", s: "On Fridays my mom goes _____ at the mall and buys new clothes.", d: ["Cooking", "Traffic", "Drum"] },
+                { en: "Traditional", he: "מסורתי", pr: "טרדישנל", emoji: "🏺", s: "Hummus is a _____ dish in the Middle East.", d: ["Loud", "Approximately", "Traffic"] },
+                { en: "Traffic", he: "תנועה / פקק", pr: "טראפיק", emoji: "🚦", s: "We were late for school because of the heavy _____ on the road.", d: ["Culture", "Island", "Drum"] },
+                { en: "Used to", he: "נהגתי ל... / היה פעם", pr: "יוזד טו", emoji: "⏳", s: "When I was little, I _____ play with toy cars every day.", d: ["In order to", "Avoid", "Click"] }
+            ],
             ofri_test: [
                 { en: "autumn", he: "סתיו", pr: "אוטום", emoji: "🍂" },
                 { en: "basketball", he: "כדורסל", pr: "בסקטבול", emoji: "🏀" },
@@ -564,7 +591,7 @@
 
         function playSoftSound(t) { const e = audioCtx.createOscillator(), o = audioCtx.createGain(); e.type = 'sine', 'correct' === t ? (e.frequency.setValueAtTime(880, audioCtx.currentTime), o.gain.setValueAtTime(.05, audioCtx.currentTime), o.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .4)) : (e.frequency.setValueAtTime(220, audioCtx.currentTime), o.gain.setValueAtTime(.05, audioCtx.currentTime), o.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .3)), e.connect(o), o.connect(audioCtx.destination), e.start(), e.stop(audioCtx.currentTime + .4) } 
         
-        function speakWord() { window.speechSynthesis.cancel(); const t = new SpeechSynthesisUtterance('en-he' === currentDirection ? currentWord.en : currentWord.he); t.lang = 'en-he' === currentDirection ? 'en-US' : 'he-IL', t.rate = .8, window.speechSynthesis.speak(t) } 
+        function speakWord() { if ('sentence' === currentDirection) return speakSentence(document.getElementById('word').innerText); window.speechSynthesis.cancel(); const t = new SpeechSynthesisUtterance('en-he' === currentDirection ? currentWord.en : currentWord.he); t.lang = 'en-he' === currentDirection ? 'en-US' : 'he-IL', t.rate = .8, window.speechSynthesis.speak(t) } 
 
         function selectTopic(t) { 
             if (currentTopic !== t) {
@@ -575,11 +602,14 @@
             }
             
             document.getElementById('topic-screen').style.display = 'none', document.getElementById('direction-screen').style.display = 'block'; 
-            const e = { inbar_test: '💎 מבחן ענבר (Unit 3)', ofri: '📚 מילים משיעור עופרי', ofri_test: 'מבחן אנגלית ד1', animals: '🦁 בעלי חיים', colors: '🎨 צבעים', pronouns: '👤 כינויים', numbers: '🔢 מספרים', verbs: '🏃 פעלים', food: '🍕 אוכל', family: '👨‍👩‍👧 משפחה', all: '🌟 כל המילים' };
+            const e = { inbar_test: '💎 מבחן ענבר (Unit 3)', inbar_words: '✏️ מילים למבחן ענבר', ofri: '📚 מילים משיעור עופרי', ofri_test: 'מבחן אנגלית ד1', animals: '🦁 בעלי חיים', colors: '🎨 צבעים', pronouns: '👤 כינויים', numbers: '🔢 מספרים', verbs: '🏃 פעלים', food: '🍕 אוכל', family: '👨‍👩‍👧 משפחה', all: '🌟 כל המילים' };
+            const hasSentences = ('all' === t ? allWords : wordBanks[t]).some(w => w.s);
+            document.getElementById('btn-sentence').style.display = hasSentences ? 'inline-block' : 'none';
+            if (!hasSentences && 'sentence' === currentDirection) selectDirection('en-he');
             document.getElementById('selected-topic-info').innerHTML = `נושא נבחר: <strong>${e[t]}</strong><br>מילים שנותרו במאגר: ${persistentPool.length} / ${originalCategorySize}` 
         } 
 
-        function selectDirection(t) { currentDirection = t, document.getElementById('btn-en-he').classList.toggle('active', 'en-he' === t), document.getElementById('btn-he-en').classList.toggle('active', 'he-en' === t) } 
+        function selectDirection(t) { currentDirection = t, document.getElementById('btn-en-he').classList.toggle('active', 'en-he' === t), document.getElementById('btn-he-en').classList.toggle('active', 'he-en' === t), document.getElementById('btn-sentence').classList.toggle('active', 'sentence' === t) } 
 
         function startGame() { 
             if (persistentPool.length === 0) {
@@ -587,8 +617,12 @@
                 persistentPool = [...source];
             }
             
-            currentPool = [...persistentPool];
-            mistakes = [], score = 0, questionsAnswered = 0, maxQuestions = 10; // סבב רגיל הוא 10
+            if ('sentence' === currentDirection && !persistentPool.some(w => w.s)) {
+                persistentPool = [...('all' === currentTopic ? allWords : wordBanks[currentTopic])];
+            }
+            currentPool = 'sentence' === currentDirection ? persistentPool.filter(w => w.s) : [...persistentPool];
+            mistakes = [], score = 0, questionsAnswered = 0, maxQuestions = Math.min(10, currentPool.length); // סבב רגיל הוא 10
+            resetWordStyle();
             
             document.getElementById('direction-screen').style.display = 'none', document.getElementById('game-screen').style.display = 'block', document.getElementById('speaker').style.display = 'en-he' === currentDirection ? 'inline-block' : 'none', nextQuestion() 
         } 
@@ -604,6 +638,7 @@
             const pIndex = persistentPool.findIndex(w => w.en === currentWord.en);
             if (pIndex > -1) persistentPool.splice(pIndex, 1);
 
+            if ('sentence' === currentDirection) return void showSentenceQuestion();
             const e = 'en-he' === currentDirection ? currentWord.en : currentWord.he, o = 'en-he' === currentDirection ? 'he' : 'en'; 
             document.getElementById('word').innerText = e, document.getElementById('feedback').innerText = ''; 
             const n = 'all' === currentTopic ? allWords : wordBanks[currentTopic]; 
@@ -613,7 +648,7 @@
             document.querySelectorAll('.opt-btn').forEach(((t, e) => { t.innerText = r[e], t.style.background = 'white', t.style.color = '#495057', t.style.borderColor = '#dee2e6', t.disabled = !1 })) 
         } 
 
-        function checkAnswer(t) { const e = document.querySelectorAll('.opt-btn'), o = e[t], n = 'en-he' === currentDirection ? currentWord.he : currentWord.en; if (o.innerText === n) { score += 5 * currentAttempts, playSoftSound('correct'), document.getElementById('score').innerText = 'ניקוד: ' + score, o.style.background = '#ebfbee', o.style.color = '#2b8a3e', o.style.borderColor = '#2b8a3e', e.forEach((t => t.disabled = !0)); const t = document.getElementById('word-emoji'); t.innerText = currentWord.emoji, t.style.display = 'block', document.getElementById('feedback').innerText = 'כל הכבוד! ✨', document.getElementById('feedback').style.color = '#2b8a3e', setTimeout(nextQuestion, 1500) } else { mistakes.find((t => t.en === currentWord.en)) || mistakes.push(currentWord), currentAttempts--, playSoftSound('wrong'), o.style.background = '#fff5f5', o.style.color = '#e03131', o.style.borderColor = '#e03131', o.disabled = !0, currentAttempts > 0 ? (document.getElementById('attempts').innerText = `ניסיונות נותרים: ${currentAttempts}`, document.getElementById('feedback').innerText = 'לא בדיוק, נסה שוב...', document.getElementById('feedback').style.color = '#f59f00') : (document.getElementById('word-emoji').innerText = currentWord.emoji, document.getElementById('word-emoji').style.display = 'block', document.getElementById('attempts').innerText = 'ניסיונות נותרים: 0', document.getElementById('feedback').innerText = `הפירוש הנכון: ${n}`, document.getElementById('feedback').style.color = '#e03131', e.forEach((t => t.disabled = !0)), setTimeout(nextQuestion, 2500)) } } 
+        function checkAnswerCore(t) { const sentence = 'sentence' === currentDirection, e = document.querySelectorAll('.opt-btn'), o = e[t], n = sentence ? sentenceLabel(currentWord.en, currentWord.s) : ('en-he' === currentDirection ? currentWord.he : currentWord.en); if (o.innerText === n) { score += 5 * currentAttempts, playSoftSound('correct'), document.getElementById('score').innerText = 'ניקוד: ' + score, o.style.background = '#ebfbee', o.style.color = '#2b8a3e', o.style.borderColor = '#2b8a3e', e.forEach((t => t.disabled = !0)); const t = document.getElementById('word-emoji'); t.innerText = currentWord.emoji, t.style.display = 'block', document.getElementById('feedback').innerText = 'כל הכבוד! ✨', document.getElementById('feedback').style.color = '#2b8a3e', setTimeout(nextQuestion, sentence ? 3500 : 1500) } else { mistakes.find((t => t.en === currentWord.en)) || mistakes.push(currentWord), currentAttempts--, playSoftSound('wrong'), o.style.background = '#fff5f5', o.style.color = '#e03131', o.style.borderColor = '#e03131', o.disabled = !0, currentAttempts > 0 ? (document.getElementById('attempts').innerText = `ניסיונות נותרים: ${currentAttempts}`, document.getElementById('feedback').innerText = 'לא בדיוק, נסה שוב...', document.getElementById('feedback').style.color = '#f59f00') : (document.getElementById('word-emoji').innerText = currentWord.emoji, document.getElementById('word-emoji').style.display = 'block', document.getElementById('attempts').innerText = 'ניסיונות נותרים: 0', document.getElementById('feedback').innerText = `${sentence ? 'התשובה הנכונה' : 'הפירוש הנכון'}: ${n}`, document.getElementById('feedback').style.color = '#e03131', e.forEach((t => t.disabled = !0)), setTimeout(nextQuestion, sentence ? 4500 : 2500)) } } 
 
         function showSummary() { 
             document.getElementById('game-screen').style.display = 'none', document.getElementById('summary-screen').style.display = 'block', document.getElementById('final-score').innerText = `סיימת עם ${score} נקודות!`; 
@@ -648,6 +683,48 @@
             }
             startGame();
         } 
+
+
+        // ===== מצב השלמת משפט =====
+        function sentenceLabel(w, sent) { return sent.trim().startsWith('_') ? w : w.toLowerCase(); }
+
+        function resetWordStyle() {
+            const w = document.getElementById('word');
+            w.style.fontSize = '', w.style.lineHeight = '', w.dir = '', w.style.direction = '';
+        }
+
+        function showSentenceQuestion() {
+            window.speechSynthesis.cancel();
+            const w = document.getElementById('word');
+            w.dir = 'ltr', w.style.fontSize = '26px', w.style.lineHeight = '1.5';
+            w.innerText = currentWord.s;
+            document.getElementById('speaker').style.display = 'none';
+            document.getElementById('feedback').innerText = '';
+            const labels = [currentWord.en, ...currentWord.d].map(x => sentenceLabel(x, currentWord.s));
+            labels.sort(() => Math.random() - .5);
+            document.querySelectorAll('.opt-btn').forEach((b, i) => { b.innerText = labels[i], b.style.background = 'white', b.style.color = '#495057', b.style.borderColor = '#dee2e6', b.disabled = false });
+        }
+
+        function revealSentence() {
+            const full = currentWord.s.replace(/_{3,}/, sentenceLabel(currentWord.en, currentWord.s));
+            document.getElementById('word').innerText = full;
+            document.getElementById('speaker').style.display = 'inline-block';
+            speakSentence(full);
+        }
+
+        function speakSentence(text) {
+            window.speechSynthesis.cancel();
+            const u = new SpeechSynthesisUtterance(text);
+            u.lang = 'en-US', u.rate = .8, window.speechSynthesis.speak(u);
+        }
+
+        function checkAnswer(t) {
+            const sentence = 'sentence' === currentDirection;
+            const btn = document.querySelectorAll('.opt-btn')[t];
+            const correct = sentence && btn.innerText === sentenceLabel(currentWord.en, currentWord.s);
+            checkAnswerCore(t);
+            if (sentence && (correct || currentAttempts === 0)) revealSentence();
+        }
 
         function backToTopics() { document.getElementById('direction-screen').style.display = 'none', document.getElementById('game-screen').style.display = 'none', document.getElementById('summary-screen').style.display = 'none', document.getElementById('topic-screen').style.display = 'block' } 
         
