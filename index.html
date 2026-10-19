@@ -591,7 +591,7 @@
 
         function playSoftSound(t) { const e = audioCtx.createOscillator(), o = audioCtx.createGain(); e.type = 'sine', 'correct' === t ? (e.frequency.setValueAtTime(880, audioCtx.currentTime), o.gain.setValueAtTime(.05, audioCtx.currentTime), o.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .4)) : (e.frequency.setValueAtTime(220, audioCtx.currentTime), o.gain.setValueAtTime(.05, audioCtx.currentTime), o.gain.exponentialRampToValueAtTime(.001, audioCtx.currentTime + .3)), e.connect(o), o.connect(audioCtx.destination), e.start(), e.stop(audioCtx.currentTime + .4) } 
         
-        function speakWord() { if ('sentence' === currentDirection) return speakSentence(document.getElementById('word').innerText); window.speechSynthesis.cancel(); const t = new SpeechSynthesisUtterance('en-he' === currentDirection ? currentWord.en : currentWord.he); t.lang = 'en-he' === currentDirection ? 'en-US' : 'he-IL', t.rate = .8, window.speechSynthesis.speak(t) } 
+        function speakWord() { if ('sentence' === currentDirection) return speakSentence(document.getElementById('word').innerText, sentenceFlow); window.speechSynthesis.cancel(); const t = new SpeechSynthesisUtterance('en-he' === currentDirection ? currentWord.en : currentWord.he); t.lang = 'en-he' === currentDirection ? 'en-US' : 'he-IL', t.rate = .8, window.speechSynthesis.speak(t) } 
 
         function selectTopic(t) { 
             if (currentTopic !== t) {
@@ -648,7 +648,7 @@
             document.querySelectorAll('.opt-btn').forEach(((t, e) => { t.innerText = r[e], t.style.background = 'white', t.style.color = '#495057', t.style.borderColor = '#dee2e6', t.disabled = !1 })) 
         } 
 
-        function checkAnswerCore(t) { const sentence = 'sentence' === currentDirection, e = document.querySelectorAll('.opt-btn'), o = e[t], n = sentence ? sentenceLabel(currentWord.en, currentWord.s) : ('en-he' === currentDirection ? currentWord.he : currentWord.en); if (o.innerText === n) { score += 5 * currentAttempts, playSoftSound('correct'), document.getElementById('score').innerText = 'ניקוד: ' + score, o.style.background = '#ebfbee', o.style.color = '#2b8a3e', o.style.borderColor = '#2b8a3e', e.forEach((t => t.disabled = !0)); const t = document.getElementById('word-emoji'); t.innerText = currentWord.emoji, t.style.display = 'block', document.getElementById('feedback').innerText = 'כל הכבוד! ✨', document.getElementById('feedback').style.color = '#2b8a3e', setTimeout(nextQuestion, sentence ? 3500 : 1500) } else { mistakes.find((t => t.en === currentWord.en)) || mistakes.push(currentWord), currentAttempts--, playSoftSound('wrong'), o.style.background = '#fff5f5', o.style.color = '#e03131', o.style.borderColor = '#e03131', o.disabled = !0, currentAttempts > 0 ? (document.getElementById('attempts').innerText = `ניסיונות נותרים: ${currentAttempts}`, document.getElementById('feedback').innerText = 'לא בדיוק, נסה שוב...', document.getElementById('feedback').style.color = '#f59f00') : (document.getElementById('word-emoji').innerText = currentWord.emoji, document.getElementById('word-emoji').style.display = 'block', document.getElementById('attempts').innerText = 'ניסיונות נותרים: 0', document.getElementById('feedback').innerText = `${sentence ? 'התשובה הנכונה' : 'הפירוש הנכון'}: ${n}`, document.getElementById('feedback').style.color = '#e03131', e.forEach((t => t.disabled = !0)), setTimeout(nextQuestion, sentence ? 4500 : 2500)) } } 
+        function checkAnswerCore(t) { const sentence = 'sentence' === currentDirection, e = document.querySelectorAll('.opt-btn'), o = e[t], n = sentence ? sentenceLabel(currentWord.en, currentWord.s) : ('en-he' === currentDirection ? currentWord.he : currentWord.en); if (o.innerText === n) { score += 5 * currentAttempts, playSoftSound('correct'), document.getElementById('score').innerText = 'ניקוד: ' + score, o.style.background = '#ebfbee', o.style.color = '#2b8a3e', o.style.borderColor = '#2b8a3e', e.forEach((t => t.disabled = !0)); const t = document.getElementById('word-emoji'); t.innerText = currentWord.emoji, t.style.display = 'block', document.getElementById('feedback').innerText = 'כל הכבוד! ✨', document.getElementById('feedback').style.color = '#2b8a3e', sentence || setTimeout(nextQuestion, 1500) } else { mistakes.find((t => t.en === currentWord.en)) || mistakes.push(currentWord), currentAttempts--, playSoftSound('wrong'), o.style.background = '#fff5f5', o.style.color = '#e03131', o.style.borderColor = '#e03131', o.disabled = !0, currentAttempts > 0 ? (document.getElementById('attempts').innerText = `ניסיונות נותרים: ${currentAttempts}`, document.getElementById('feedback').innerText = 'לא בדיוק, נסה שוב...', document.getElementById('feedback').style.color = '#f59f00') : (document.getElementById('word-emoji').innerText = currentWord.emoji, document.getElementById('word-emoji').style.display = 'block', document.getElementById('attempts').innerText = 'ניסיונות נותרים: 0', document.getElementById('feedback').innerText = `${sentence ? 'התשובה הנכונה' : 'הפירוש הנכון'}: ${n}`, document.getElementById('feedback').style.color = '#e03131', e.forEach((t => t.disabled = !0)), sentence || setTimeout(nextQuestion, 2500)) } } 
 
         function showSummary() { 
             document.getElementById('game-screen').style.display = 'none', document.getElementById('summary-screen').style.display = 'block', document.getElementById('final-score').innerText = `סיימת עם ${score} נקודות!`; 
@@ -705,17 +705,35 @@
             document.querySelectorAll('.opt-btn').forEach((b, i) => { b.innerText = labels[i], b.style.background = 'white', b.style.color = '#495057', b.style.borderColor = '#dee2e6', b.disabled = false });
         }
 
+        // מעבר לשאלה הבאה רק אחרי שההקראה הסתיימה (עם טיימר גיבוי למקרה ש-onend לא נורה, למשל באייפון)
+        let sentenceFlow = null, activeUtterance = null;
+
         function revealSentence() {
             const full = currentWord.s.replace(/_{3,}/, sentenceLabel(currentWord.en, currentWord.s));
             document.getElementById('word').innerText = full;
             document.getElementById('speaker').style.display = 'inline-block';
-            speakSentence(full);
+
+            const q = questionsAnswered;
+            let done = false, fallback;
+            const flow = {
+                est: Math.max(4000, full.split(/\s+/).length * 600 + 2000),
+                advance() { if (done || q !== questionsAnswered) return; done = true, clearTimeout(fallback), setTimeout(nextQuestion, 900) },
+                arm() { clearTimeout(fallback), fallback = setTimeout(flow.advance, flow.est) }
+            };
+            sentenceFlow = flow;
+            speakSentence(full, flow);
         }
 
-        function speakSentence(text) {
+        function speakSentence(text, flow) {
             window.speechSynthesis.cancel();
             const u = new SpeechSynthesisUtterance(text);
-            u.lang = 'en-US', u.rate = .8, window.speechSynthesis.speak(u);
+            u.lang = 'en-US', u.rate = .8;
+            activeUtterance = u;
+            if (flow) {
+                flow.arm();
+                u.onend = u.onerror = () => { if (activeUtterance === u) flow.advance() };
+            }
+            window.speechSynthesis.speak(u);
         }
 
         function checkAnswer(t) {
